@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ZR Manager">
+<meta name="theme-color" content="#ffffff">
+<title>Zahraaracil — Social Manager</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#fff;--bg2:#f7f7f5;--bg3:#f0efe8;--txt:#1a1a1a;--txt2:#555;--txt3:#aaa;--bdr:rgba(0,0,0,0.12);--bdr2:rgba(0,0,0,0.22);--success:#0f6e56;--sbg:#e1f5ee;--warn:#854f0b;--wbg:#faeeda;--danger:#a32d2d;--dbg:#fcebeb;--info:#185fa5;--ibg:#e6f1fb;--r:10px;--rl:14px;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;--txt:#f2f2f7;--txt2:#aeaeb2;--txt3:#636366;--bdr:rgba(255,255,255,0.12);--bdr2:rgba(255,255,255,0.22)}}
+body{font-family:var(--font);background:var(--bg3);color:var(--txt);padding-bottom:72px}
+.app{max-width:500px;margin:0 auto;background:var(--bg);min-height:100vh}
+.hdr{padding:14px 16px 10px;border-bottom:0.5px solid var(--bdr);background:var(--bg);position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:16px;font-weight:700;color:var(--txt)}
+.logo small{font-size:11px;font-weight:400;color:var(--txt3);display:block;margin-top:-1px}
+.hbtns{display:flex;gap:6px}
+.btn{background:var(--bg);border:0.5px solid var(--bdr2);border-radius:var(--r);padding:7px 13px;font-size:12px;font-weight:600;color:var(--txt);cursor:pointer;font-family:var(--font)}
+.btn:active{opacity:0.6}
+.btn-p{background:var(--txt);color:var(--bg);border-color:var(--txt)}
+.btn-sm{padding:5px 11px;font-size:11px}
+.btn-ai{background:linear-gradient(135deg,#534AB7,#D4537E);color:#fff;border:none}
+.btn-d{color:var(--danger);border-color:rgba(163,45,45,0.3)}
+.nav{display:flex;border-top:0.5px solid var(--bdr);background:var(--bg);position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;z-index:50}
+.ntab{flex:1;padding:8px 4px 10px;text-align:center;cursor:pointer;font-size:9px;font-weight:600;color:var(--txt3);border:none;background:none;font-family:var(--font)}
+.ntab.on{color:var(--txt)}
+.ntab .ic{font-size:18px;display:block;margin-bottom:2px}
+.pg{display:none;padding:14px 14px 0}
+.pg.on{display:block}
+.abar{display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;margin-bottom:10px}
+.abar::-webkit-scrollbar{display:none}
+.apill{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:0.5px solid var(--bdr);color:var(--txt2);background:var(--bg);white-space:nowrap;flex-shrink:0}
+.apill.on{border-width:2px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+.sc{background:var(--bg2);border-radius:var(--r);padding:10px 8px;text-align:center}
+.scv{font-size:18px;font-weight:700;color:var(--txt)}
+.scl{font-size:9px;color:var(--txt3);margin-top:2px}
+.stitle{font-size:11px;font-weight:700;color:var(--txt2);margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase}
+.tbox{background:var(--bg2);border-radius:var(--rl);padding:12px;margin-bottom:12px}
+.tlbl{font-size:9px;font-weight:700;color:var(--txt3);letter-spacing:0.06em;margin-bottom:8px;text-transform:uppercase}
+.tt{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--r);margin-bottom:5px;cursor:pointer}
+.tt.done{opacity:0.4}
+.tt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tt-ttl{font-size:13px;color:var(--txt);flex:1;font-weight:500}
+.tbadge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.tc{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rl);padding:12px;margin-bottom:8px;cursor:pointer}
+.tc.done{opacity:0.45}
+.th{display:flex;gap:9px;align-items:flex-start}
+.chk{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--bdr2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+.chk.on{background:var(--txt);border-color:var(--txt);color:var(--bg)}
+.ttl{font-size:13px;font-weight:500;color:var(--txt);flex:1;line-height:1.4}
+.tc.done .ttl{text-decoration:line-through;opacity:0.6}
+.meta{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;align-items:center}
+.pb{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px}
+.dlbl{font-size:10px;color:var(--txt3)}
+.slbl{font-size:10px;font-weight:700}
+.nbar{font-size:11px;color:var(--txt2);margin-top:6px;padding:5px 9px;background:var(--bg2);border-radius:8px;border-left:2px solid var(--bdr2);line-height:1.4}
+.exp{display:none;margin-top:10px;border-top:0.5px solid var(--bdr);padding-top:10px;gap:6px}
+.tc.open .exp{display:flex}
+.panel{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rl);padding:13px;margin-bottom:10px}
+.pt{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:10px}
+.br{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bl{font-size:11px;color:var(--txt2);width:110px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bt{flex:1;background:var(--bdr);border-radius:3px;height:7px}
+.bf{height:7px;border-radius:3px}
+.bv{font-size:11px;color:var(--txt3);width:52px;text-align:right;flex-shrink:0}
+.ins{border-left:3px solid;padding:8px 10px;border-radius:0 var(--r) var(--r) 0;margin-bottom:7px;font-size:12px;line-height:1.5}
+.ig{border-color:#1d9e75;background:var(--sbg);color:var(--success)}
+.iw{border-color:#ef9f27;background:var(--wbg);color:var(--warn)}
+.ir{border-color:#e24b4a;background:var(--dbg);color:var(--danger)}
+.uzone{border:2px dashed var(--bdr2);border-radius:var(--rl);padding:24px 16px;text-align:center;cursor:pointer;margin-bottom:12px}
+.uzone:active{background:var(--bg2)}
+.empty{text-align:center;padding:32px 16px;color:var(--txt3);font-size:13px;line-height:1.7}
+.cn{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cmo{font-size:14px;font-weight:700;color:var(--txt)}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cdow{text-align:center;font-size:10px;color:var(--txt3);font-weight:600;padding:4px 0}
+.cday{min-height:50px;border:0.5px solid var(--bdr);border-radius:8px;padding:3px;cursor:pointer;background:var(--bg)}
+.cday.tod{border-color:var(--txt);border-width:2px}
+.cday.sel{background:var(--bg2)}
+.cday.om{opacity:0.25}
+.dn{font-size:10px;font-weight:600;color:var(--txt2);margin-bottom:2px}
+.cdots{display:flex;flex-wrap:wrap;gap:2px}
+.cdot{width:5px;height:5px;border-radius:50%}
+.sheet{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.sb{background:var(--bg);border-radius:22px 22px 0 0;padding:16px 16px 36px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto}
+.sh{width:36px;height:4px;background:var(--bdr2);border-radius:2px;margin:0 auto 14px}
+.stit{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:14px;text-align:center}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--txt2);margin-bottom:4px;letter-spacing:0.04em;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{width:100%;font-size:14px;padding:11px 12px;border-radius:var(--r);border:0.5px solid var(--bdr2);background:var(--bg);color:var(--txt);font-family:var(--font);-webkit-appearance:none}
+.fg textarea{height:72px;resize:none}
+.prow{display:flex;gap:6px;flex-wrap:wrap}
+.pc{padding:7px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid var(--bdr);color:var(--txt2);background:var(--bg)}
+.ma{display:flex;gap:8px;margin-top:14px}
+.ma .btn{flex:1;padding:13px;font-size:14px;text-align:center;border-radius:var(--r)}
+.frow{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.frow::-webkit-scrollbar{display:none}
+.frow select{font-size:12px;padding:7px 11px;border-radius:20px;border:0.5px solid var(--bdr2);background:var(--bg);color:var(--txt);font-family:var(--font);-webkit-appearance:none;flex-shrink:0}
+.ai-banner{background:linear-gradient(135deg,#EEEDFE,#FBEAF0);border:0.5px solid #AFA9EC;border-radius:var(--rl);padding:14px;margin-bottom:14px}
+.ai-title{font-size:13px;font-weight:700;color:#3C3489;margin-bottom:4px}
+.ai-sub{font-size:11px;color:#534AB7;margin-bottom:10px;line-height:1.5}
+.ai-btn{background:#534AB7;color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;font-family:var(--font)}
+.ai-btn:active{opacity:0.8}
+.ai-chat{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rl);margin-top:10px;overflow:hidden}
+.ai-msgs{padding:12px;max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.msg-ai{background:#EEEDFE;border-radius:12px 12px 12px 4px;padding:10px 12px;font-size:12px;color:#26215C;line-height:1.6;max-width:90%;align-self:flex-start}
+.msg-user{background:var(--txt);border-radius:12px 12px 4px 12px;padding:10px 12px;font-size:12px;color:var(--bg);line-height:1.6;max-width:90%;align-self:flex-end}
+.ai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:0.5px solid var(--bdr);background:var(--bg2)}
+.ai-input{flex:1;font-size:13px;padding:8px 12px;border-radius:20px;border:0.5px solid var(--bdr2);background:var(--bg);color:var(--txt);font-family:var(--font)}
+.ai-send{background:#534AB7;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);flex-shrink:0}
+.ai-send:active{opacity:0.8}
+.ai-loading{display:flex;gap:4px;align-items:center;padding:4px 0}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:#534AB7;animation:blink 1.2s infinite}
+.ai-dot:nth-child(2){animation-delay:0.2s}
+.ai-dot:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0.2}40%{opacity:1}}
+.task-preview{background:var(--bg2);border:0.5px solid var(--bdr);border-radius:var(--r);padding:10px 12px;margin-top:6px}
+.task-preview-title{font-size:12px;font-weight:600;color:var(--txt);margin-bottom:4px}
+.task-preview-meta{font-size:10px;color:var(--txt3)}
+.add-tasks-btn{background:#0f6e56;color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;font-family:var(--font);margin-top:8px}
+.add-tasks-btn:active{opacity:0.8}
+.acct-card{background:var(--bg);border:0.5px solid var(--bdr);border-radius:var(--rl);padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="logo">Zahraaracil <small>Social Manager</small></div>
+  <div class="hbtns">
+    <button class="btn btn-sm" onclick="openAS()">+ Account</button>
+    <button class="btn btn-p btn-sm" onclick="openTS()">+ Task</button>
+  </div>
+</div>
+
+<div class="pg on" id="pg-today">
+  <div class="abar" id="ab-today"></div>
+  <div class="tbox"><div class="tlbl" id="tdlbl"></div><div id="ti"></div></div>
+  <div class="stitle">This week</div>
+  <div id="wi"></div>
+</div>
+
+<div class="pg" id="pg-ai">
+  <div class="ai-banner">
+    <div class="ai-title">AI Content Planner</div>
+    <div class="ai-sub">Tell the AI about your channel, what's been working, and how many days you want to plan. It will generate ready-to-add tasks for you.</div>
+    <button class="ai-btn" onclick="startAI()">Generate my weekly content plan</button>
+  </div>
+  <div class="ai-chat" id="ai-chat" style="display:none">
+    <div class="ai-msgs" id="ai-msgs"></div>
+    <div class="ai-input-row">
+      <input class="ai-input" id="ai-input" placeholder="Reply to the AI..." onkeydown="if(event.key==='Enter')sendAI()">
+      <button class="ai-send" onclick="sendAI()">Send</button>
+    </div>
+  </div>
+  <div id="ai-tasks-preview"></div>
+</div>
+
+<div class="pg" id="pg-calendar">
+  <div class="abar" id="ab-cal"></div>
+  <div class="cn">
+    <button class="btn btn-sm" onclick="prevMo()">&#8592;</button>
+    <div class="cmo" id="cmolbl"></div>
+    <button class="btn btn-sm" onclick="nextMo()">&#8594;</button>
+  </div>
+  <div class="cg" id="cgrid"></div>
+  <div id="cdtasks" style="margin-top:12px"></div>
+</div>
+
+<div class="pg" id="pg-tasks">
+  <div class="frow">
+    <select id="fa" onchange="renderTasks()"><option value="">All accounts</option></select>
+    <select id="fp" onchange="renderTasks()"><option value="">All platforms</option><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Snapchat</option></select>
+    <select id="fs" onchange="renderTasks()"><option value="">All</option><option value="pending">Needs editing</option><option value="ready">Ready</option><option value="posted">Posted</option></select>
+  </div>
+  <div id="atl"></div>
+</div>
+
+<div class="pg" id="pg-analytics">
+  <div class="abar" id="ab-an"></div>
+  <div class="uzone" onclick="document.getElementById('cfi').click()">
+    <input type="file" id="cfi" accept=".csv" style="display:none" onchange="handleCSV(event)">
+    <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:5px">Upload analytics CSV</div>
+    <div style="font-size:11px;color:var(--txt3);line-height:1.6">YouTube Studio · Instagram Insights · TikTok Analytics<br>Tap to choose file</div>
+  </div>
+  <div id="ao"></div>
+</div>
+
+<div class="pg" id="pg-accounts"><div id="acl"></div></div>
+
+<nav class="nav">
+  <button class="ntab on" onclick="showPg('today',this)"><span class="ic">🏠</span>Today</button>
+  <button class="ntab" onclick="showPg('ai',this)"><span class="ic">✨</span>AI Plan</button>
+  <button class="ntab" onclick="showPg('calendar',this)"><span class="ic">📅</span>Calendar</button>
+  <button class="ntab" onclick="showPg('tasks',this)"><span class="ic">✅</span>Tasks</button>
+  <button class="ntab" onclick="showPg('accounts',this)"><span class="ic">👤</span>Accounts</button>
+</nav>
+</div>
+
+<div class="sheet" id="ts" onclick="csb(event,'ts')">
+<div class="sb">
+  <div class="sh"></div>
+  <div class="stit" id="tstit">New task</div>
+  <div class="fg"><label>Title</label><input type="text" id="ftit" placeholder="e.g. رسيل غيرانة من زهراء"></div>
+  <div class="fg"><label>Notes / caption</label><textarea id="fnotes" placeholder="Caption, editing notes, reminders..."></textarea></div>
+  <div class="fg"><label>Date</label><input type="date" id="fdate"></div>
+  <div class="fg"><label>Account</label><select id="faccts"></select></div>
+  <div class="fg"><label>Platforms</label><div class="prow" id="ppicks"></div></div>
+  <div class="fg"><label>Status</label><select id="fstat"><option value="pending">Needs editing</option><option value="ready">Ready to post</option><option value="posted">Posted</option></select></div>
+  <div class="ma">
+    <button class="btn" onclick="cs('ts')">Cancel</button>
+    <button class="btn btn-p" onclick="saveTask()">Save task</button>
+  </div>
+</div>
+</div>
+
+<div class="sheet" id="as" onclick="csb(event,'as')">
+<div class="sb">
+  <div class="sh"></div>
+  <div class="stit">Add account</div>
+  <div class="fg"><label>Account name</label><input type="text" id="aname" placeholder="e.g. Zahraaracil Main"></div>
+  <div class="fg"><label>Platform</label><select id="aplat"><option>YouTube</option><option>Instagram</option><option>TikTok</option><option>Snapchat</option></select></div>
+  <div class="fg"><label>Handle (optional)</label><input type="text" id="ahandle" placeholder="@username"></div>
+  <div class="ma">
+    <button class="btn" onclick="cs('as')">Cancel</button>
+    <button class="btn btn-p" onclick="saveAcct()">Add account</button>
+  </div>
+</div>
+</div>
+
+<script>
+const PC={YouTube:{bg:'#fcebeb',col:'#a32d2d',dot:'#e24b4a'},Instagram:{bg:'#fbeaf0',col:'#72243e',dot:'#d4537e'},TikTok:{bg:'#e1f5ee',col:'#085041',dot:'#1d9e75'},Snapchat:{bg:'#faeeda',col:'#633806',dot:'#ef9f27'}};
+let accounts=[],tasks=[],sa=null,etid=null,calY,calM,sd=null,oc=new Set();
+let aiMsgs=[],aiPendingTasks=[],aiActive=false;
+
+function save(){try{localStorage.setItem('zrma3',JSON.stringify(accounts));localStorage.setItem('zrmt3',JSON.stringify(tasks));}catch(e){}}
+function load(){try{const a=localStorage.getItem('zrma3'),t=localStorage.getItem('zrmt3');if(a)accounts=JSON.parse(a);if(t)tasks=JSON.parse(t);}catch(e){}}
+function today(){return new Date().toISOString().slice(0,10)}
+function fmtD(s){if(!s)return'';return new Date(s+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}
+function pb(p){const c=PC[p]||{bg:'#eee',col:'#333'};return`<span class="pb" style="background:${c.bg};color:${c.col}">${p}</span>`}
+function dotC(id){const a=accounts.find(x=>x.id===id);return a?(PC[a.platform]||PC.YouTube).dot:'#aaa'}
+function acC(id){const a=accounts.find(x=>x.id===id);return a?(PC[a.platform]||PC.YouTube):PC.YouTube}
+
+function showPg(id,el){document.querySelectorAll('.pg').forEach(v=>v.classList.remove('on'));document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));document.getElementById('pg-'+id).classList.add('on');el.classList.add('on');if(id==='today')rToday();else if(id==='calendar')rCal();else if(id==='tasks')renderTasks();else if(id==='accounts')rAccts();}
+
+function rBar(cid,aid,fn){const el=document.getElementById(cid);if(!el)return;let h=`<div class="apill" style="border-style:dashed;color:var(--txt3)" onclick="${fn}('')">All</div>`;h+=accounts.map(a=>{const c=PC[a.platform]||PC.YouTube;const on=a.id===aid;return`<div class="apill ${on?'on':''}" onclick="${fn}('${a.id}')" style="${on?`border-color:${c.dot};color:${c.col};background:${c.bg}`:''}"> ${a.name}</div>`;}).join('');el.innerHTML=h;}
+
+function sTA(id){sa=id||null;rToday();}function sCA(id){sa=id||null;rCal();}function sAA(id){sa=id||null;}
+
+function rToday(){
+  rBar('ab-today',sa,'sTA');
+  const t=today();document.getElementById('tdlbl').textContent='Today — '+new Date(t+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const tts=tasks.filter(x=>x.date===t&&(!sa||x.acctId===sa));const ti=document.getElementById('ti');
+  if(!tts.length)ti.innerHTML='<div style="font-size:12px;color:var(--txt3);padding:2px 0">Nothing today. Use AI Plan to generate tasks.</div>';
+  else ti.innerHTML=tts.map(x=>{const a=accounts.find(ac=>ac.id===x.acctId);const st=x.status==='pending'?`<span class="tbadge" style="background:var(--wbg);color:var(--warn)">Needs editing</span>`:x.status==='ready'?`<span class="tbadge" style="background:var(--ibg);color:var(--info)">Ready</span>`:'';return`<div class="tt ${x.posted?'done':''}" onclick="tgP('${x.id}')"><div class="tt-dot" style="background:${dotC(x.acctId)}"></div><div style="flex:1"><div class="tt-ttl">${x.title}</div><div style="font-size:10px;color:var(--txt3);margin-top:2px">${a?a.name+' · ':''} ${(x.platforms||[]).join(', ')}</div></div>${st}</div>`;}).join('');
+  const end=new Date(t+'T00:00:00');end.setDate(end.getDate()+7);const es=end.toISOString().slice(0,10);
+  const wts=tasks.filter(x=>x.date>t&&x.date<=es&&(!sa||x.acctId===sa)).sort((a,b)=>a.date>b.date?1:-1);
+  const wi=document.getElementById('wi');wi.innerHTML=wts.length?wts.map(x=>tCard(x)).join(''):'<div class="empty">No tasks this week. Tap "AI Plan" to generate some.</div>';att(wi);
+}
+
+function tCard(x){
+  const a=accounts.find(ac=>ac.id===x.acctId);const c=acC(x.acctId);
+  const st=x.status==='pending'?{l:'Needs editing',c:'var(--warn)'}:x.status==='ready'?{l:'Ready',c:'var(--info)'}:{l:'Posted',c:'var(--success)'};
+  const note=x.notes?`<div class="nbar" style="${x.status==='pending'?'border-color:var(--warn)':''}">${x.notes}</div>`:'';
+  return`<div class="tc ${x.posted?'done':''} ${oc.has(x.id)?'open':''}" data-id="${x.id}" onclick="tgC(event,this)"><div class="th"><div class="chk ${x.posted?'on':''}" onclick="event.stopPropagation();tgP('${x.id}')">${x.posted?'✓':''}</div><div style="flex:1;min-width:0"><div class="ttl">${x.title}</div><div class="meta">${a?`<span class="pb" style="background:${c.bg};color:${c.col}">${a.name}</span>`:''} ${(x.platforms||[]).map(p=>pb(p)).join('')}<span class="dlbl">${fmtD(x.date)}</span><span class="slbl" style="color:${st.c}">${st.l}</span></div>${note}</div></div><div class="exp"><button class="btn btn-sm" onclick="event.stopPropagation();editTask('${x.id}')">Edit</button><button class="btn btn-sm btn-d" onclick="event.stopPropagation();delTask('${x.id}')">Delete</button></div></div>`;
+}
+function tgC(e,card){if(e.target.closest('.chk')||e.target.closest('.btn'))return;const id=card.dataset.id;if(oc.has(id))oc.delete(id);else oc.add(id);rCurPg();}
+function att(el){el.querySelectorAll('.tc[data-id]').forEach(c=>{c.onclick=function(e){tgC(e,this)};});}
+function rCurPg(){const on=document.querySelector('.pg.on');if(!on)return;const id=on.id.replace('pg-','');if(id==='today')rToday();else if(id==='calendar')rCal();else if(id==='tasks')renderTasks();else if(id==='accounts')rAccts();}
+function tgP(id){const t=tasks.find(x=>x.id===id);if(!t)return;t.posted=!t.posted;if(t.posted)t.status='posted';save();rCurPg();}
+function delTask(id){if(!confirm('Delete this task?'))return;tasks=tasks.filter(x=>x.id!==id);oc.delete(id);save();rCurPg();}
+function renderTasks(){const fa=document.getElementById('fa').value,fp=document.getElementById('fp').value,fs=document.getElementById('fs').value;let list=[...tasks].sort((a,b)=>a.date>b.date?1:-1);if(fa)list=list.filter(x=>x.acctId===fa);if(fp)list=list.filter(x=>(x.platforms||[]).includes(fp));if(fs==='pending')list=list.filter(x=>!x.posted);if(fs==='posted')list=list.filter(x=>x.posted);const el=document.getElementById('atl');el.innerHTML=list.length?list.map(x=>tCard(x)).join(''):'<div class="empty">No tasks yet.</div>';att(el);}
+
+const NOW=new Date();calY=NOW.getFullYear();calM=NOW.getMonth();
+function rCal(){rBar('ab-cal',sa,'sCA');const mos=['January','February','March','April','May','June','July','August','September','October','November','December'];document.getElementById('cmolbl').textContent=mos[calM]+' '+calY;const g=document.getElementById('cgrid');let h=['S','M','T','W','T','F','S'].map(d=>`<div class="cdow">${d}</div>`).join('');const first=new Date(calY,calM,1).getDay(),days=new Date(calY,calM+1,0).getDate(),td=today();for(let i=0;i<first;i++)h+=`<div class="cday om"></div>`;for(let d=1;d<=days;d++){const ds=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const dt=tasks.filter(x=>x.date===ds&&(!sa||x.acctId===sa));const dots=dt.slice(0,4).map(x=>`<div class="cdot" style="background:${dotC(x.acctId)}"></div>`).join('');h+=`<div class="cday ${ds===td?'tod':''} ${ds===sd?'sel':''}" onclick="sDFn('${ds}')"><div class="dn">${d}</div><div class="cdots">${dots}</div></div>`;}g.innerHTML=h;if(sd)rCalDay(sd);}
+function sDFn(ds){sd=ds;rCal();}
+function rCalDay(ds){const el=document.getElementById('cdtasks');const list=tasks.filter(x=>x.date===ds&&(!sa||x.acctId===sa));el.innerHTML=`<div class="stitle">${fmtD(ds)}</div>`+(list.length?list.map(x=>tCard(x)).join(''):`<div class="empty">Nothing on ${fmtD(ds)}.<br><span style="color:var(--info);cursor:pointer" onclick="openTSD('${ds}')">Add a task</span></div>`);att(el);}
+function prevMo(){calM--;if(calM<0){calM=11;calY--;}rCal();}
+function nextMo(){calM++;if(calM>11){calM=0;calY++;}rCal();}
+
+function handleCSV(e){const file=e.target.files[0];if(!file)return;const out=document.getElementById('ao');out.innerHTML='<div style="text-align:center;padding:20px;color:var(--txt3);font-size:13px">Analyzing...</div>';Papa.parse(file,{header:true,skipEmptyLines:true,complete:r=>analyzeCSV(r.data,file.name,out)});e.target.value='';}
+function analyzeCSV(rows,fname,el){if(!rows||!rows.length){el.innerHTML='<div class="ins ir">Could not read file.</div>';return;}const cols=Object.keys(rows[0]).map(c=>c.toLowerCase());const isYT=cols.some(c=>c.includes('view')||c.includes('impression'));const isIG=cols.some(c=>c.includes('reach')||c.includes('follower'));const platform=isYT?'YouTube':isIG?'Instagram':'Social';function gv(row,kws){const k=Object.keys(row).find(k=>kws.some(w=>k.toLowerCase().includes(w)));return k?parseFloat(String(row[k]).replace(/,/g,''))||0:0;}function gs(row,kws){const k=Object.keys(row).find(k=>kws.some(w=>k.toLowerCase().includes(w)));return k?String(row[k]).trim():'';}const items=rows.map(r=>({title:gs(r,['title','video title','content','post']),views:gv(r,['view','play','reach','impression']),subs:gv(r,['subscriber','follower','sub']),likes:gv(r,['like','heart']),ctr:gv(r,['click-through','ctr'])})).filter(x=>x.views>0||x.likes>0);if(!items.length){el.innerHTML='<div class="ins iw">No data columns found. Try Advanced Mode export.</div>';return;}const tv=items.reduce((s,x)=>s+x.views,0),ts=items.reduce((s,x)=>s+x.subs,0),tl=items.reduce((s,x)=>s+x.likes,0);const ctrs=items.filter(x=>x.ctr>0);const ac=ctrs.length?ctrs.reduce((s,x)=>s+x.ctr,0)/ctrs.length:0;const top5=[...items].sort((a,b)=>b.views-a.views).slice(0,5);const mv=top5[0]?top5[0].views:1;function fv(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1000?(n/1000).toFixed(0)+'K':Math.round(n).toString();}let h=`<div style="font-size:10px;font-weight:700;color:var(--txt3);margin-bottom:8px">${platform} · ${fname} · ${items.length} items</div>`;h+=`<div class="g4"><div class="sc"><div class="scv">${fv(tv)}</div><div class="scl">Views</div></div><div class="sc"><div class="scv" style="color:var(--success)">${ts>0?'+'+fv(ts):'—'}</div><div class="scl">Followers</div></div><div class="sc"><div class="scv">${tl>0?fv(tl):'—'}</div><div class="scl">Likes</div></div><div class="sc"><div class="scv">${ac>0?ac.toFixed(1)+'%':'—'}</div><div class="scl">CTR</div></div></div>`;if(top5.length){h+=`<div class="panel"><div class="pt">Top content</div>`;h+=top5.map(x=>`<div class="br"><div class="bl" title="${x.title}">${x.title||'(no title)'}</div><div class="bt"><div class="bf" style="width:${Math.round(x.views/mv*100)}%;background:#378add"></div></div><div class="bv">${fv(x.views)}</div></div>`).join('');h+=`</div>`;}const ins=[];if(top5[0]&&items.length>1){const avg=tv/items.length;if(top5[0].views>avg*4)ins.push({t:'g',m:`Top video gets ${Math.round(top5[0].views/avg)}x average. Replicate that format.`});}if(ac>0&&ac<3)ins.push({t:'w',m:`CTR ${ac.toFixed(1)}% is low. Bigger faces and bolder Arabic text on thumbnails will help.`});if(ac>5)ins.push({t:'g',m:`CTR ${ac.toFixed(1)}% is excellent. Keep this thumbnail style.`});if(ts>0&&tv>0){const r=Math.round(tv/ts);ins.push({t:r>500?'w':'g',m:`${r} views per subscriber. ${r>500?'Add a subscribe CTA in your videos.':'Great conversion.'}`);}if(ins.length){h+=`<div class="panel"><div class="pt">Insights</div>${ins.map(i=>`<div class="ins ${i.t==='g'?'ig':i.t==='w'?'iw':'ir'}">${i.m}</div>`).join('')}</div>`;}el.innerHTML=h;}
+
+function rAccts(){const el=document.getElementById('acl');if(!accounts.length){el.innerHTML='<div class="empty">No accounts yet.<br>Tap "+ Account" to add one.</div>';return;}const tc={},pc={};tasks.forEach(t=>{tc[t.acctId]=(tc[t.acctId]||0)+1;if(t.posted)pc[t.acctId]=(pc[t.acctId]||0)+1;});el.innerHTML=accounts.map(a=>{const c=PC[a.platform]||PC.YouTube;return`<div class="acct-card"><div style="width:42px;height:42px;border-radius:50%;background:${c.bg};color:${c.col};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0">${a.name.slice(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--txt)">${a.name}</div><div style="font-size:11px;color:var(--txt3);margin-top:3px;line-height:1.4">${a.platform}${a.handle?' · '+a.handle:''}<br>${tc[a.id]||0} tasks · ${pc[a.id]||0} posted</div></div><button class="btn btn-sm btn-d" onclick="delAcct('${a.id}')">Remove</button></div>`;}).join('');}
+
+function openTS(){oTSF(null,null);}function openTSD(ds){oTSF(null,ds);}
+function oTSF(aid,ds){etid=null;document.getElementById('tstit').textContent='New task';document.getElementById('ftit').value='';document.getElementById('fnotes').value='';document.getElementById('fdate').value=ds||sd||today();document.getElementById('fstat').value='pending';popAS(aid);bldPP([]);document.getElementById('ts').classList.add('open');setTimeout(()=>document.getElementById('ftit').focus(),350);}
+function editTask(id){const t=tasks.find(x=>x.id===id);if(!t)return;etid=id;document.getElementById('tstit').textContent='Edit task';document.getElementById('ftit').value=t.title;document.getElementById('fnotes').value=t.notes||'';document.getElementById('fdate').value=t.date||'';document.getElementById('fstat').value=t.status||'pending';popAS(t.acctId);bldPP(t.platforms||[]);document.getElementById('ts').classList.add('open');}
+function popAS(sid){const s=document.getElementById('faccts');s.innerHTML=accounts.length?accounts.map(a=>`<option value="${a.id}" ${a.id===sid?'selected':''}>${a.name} (${a.platform})</option>`).join(''):'<option value="">Add an account first</option>';}
+function bldPP(sel){document.getElementById('ppicks').innerHTML=['YouTube','Instagram','TikTok','Snapchat'].map(p=>{const on=sel.includes(p);const c=PC[p];return`<div class="pc ${on?'on':''}" data-p="${p}" onclick="tgPC(this)" style="${on?`background:${c.dot};color:#fff;border-color:${c.dot}`:''}"> ${p}</div>`;}).join('');}
+function tgPC(el){el.classList.toggle('on');const p=el.dataset.p;const c=PC[p];if(el.classList.contains('on')){el.style.background=c.dot;el.style.color='#fff';el.style.borderColor=c.dot;}else{el.style.background='';el.style.color='';el.style.borderColor='';}}
+function saveTask(){const title=document.getElementById('ftit').value.trim();if(!title){document.getElementById('ftit').focus();return;}const task={id:etid||('t'+Date.now()),title,notes:document.getElementById('fnotes').value.trim(),date:document.getElementById('fdate').value,acctId:document.getElementById('faccts').value,platforms:[...document.querySelectorAll('.pc.on')].map(el=>el.dataset.p),status:document.getElementById('fstat').value,posted:etid?(tasks.find(x=>x.id===etid)||{}).posted:false,created:Date.now()};if(etid)tasks=tasks.map(x=>x.id===etid?task:x);else tasks.push(task);tasks.sort((a,b)=>a.date>b.date?1:-1);save();cs('ts');rCurPg();popTF();}
+function openAS(){document.getElementById('as').classList.add('open');setTimeout(()=>document.getElementById('aname').focus(),350);}
+function saveAcct(){const name=document.getElementById('aname').value.trim();if(!name){document.getElementById('aname').focus();return;}accounts.push({id:'a'+Date.now(),name,platform:document.getElementById('aplat').value,handle:document.getElementById('ahandle').value.trim()});save();cs('as');document.getElementById('aname').value='';document.getElementById('ahandle').value='';popTF();rCurPg();}
+function delAcct(id){if(!confirm('Remove this account?'))return;accounts=accounts.filter(x=>x.id!==id);save();rAccts();popTF();}
+function popTF(){const s=document.getElementById('fa');const cur=s.value;s.innerHTML='<option value="">All accounts</option>'+accounts.map(a=>`<option value="${a.id}" ${a.id===cur?'selected':''}>${a.name}</option>`).join('');}
+function cs(id){document.getElementById(id).classList.remove('open');}
+function csb(e,id){if(e.target===document.getElementById(id))cs(id);}
+
+function startAI(){
+  document.getElementById('ai-chat').style.display='block';
+  aiMsgs=[];aiPendingTasks=[];
+  const acctNames=accounts.map(a=>`${a.name} (${a.platform})`).join(', ')||'no accounts added yet';
+  const sysMsg=`You are a content planning assistant for an Arabic family YouTube/social media channel called Zahraaracil. The channel features two young girls: Zahraa (older sister) and Racil (baby). The channel's best performing content involves: Racil getting jealous when dad pays attention to Zahraa, crying/emotional reactions, ice cream as a prop, and sibling rivalry moments. The channel posts Shorts mainly and is growing toward long-form content. The audience is primarily Iraqi and Saudi Arabic speakers.
+
+Current accounts: ${acctNames}
+
+Your job is to have a SHORT conversation (2-3 messages max) to understand what they need, then generate a content plan as a JSON array of tasks. 
+
+Ask ONE question first: how many days they want to plan and if there's anything specific happening this week (trip, event, special occasion).
+
+Then generate tasks in this exact JSON format wrapped in <TASKS> tags:
+<TASKS>[{"title":"video title in Arabic","notes":"filming tip or caption idea","date":"YYYY-MM-DD","platforms":["YouTube","Instagram","TikTok","Snapchat"],"status":"pending","acctId":""}]</TASKS>
+
+Generate 5-10 tasks starting from tomorrow. Mix Shorts (Mon/Tue/Thu/Sat) with one long-form (Wednesday). Use the proven jealousy/reaction/ice cream formula. Titles should be in Arabic. Notes in English. Always include all 4 platforms for Shorts, YouTube only for long-form.`;
+
+  aiMsgs=[{role:'user',content:'Start the conversation. Greet me briefly and ask your one question.'}];
+  callAI(sysMsg,aiMsgs);
+}
+
+function addAIMsg(role,content){
+  const el=document.getElementById('ai-msgs');
+  const div=document.createElement('div');
+  div.className=role==='assistant'?'msg-ai':'msg-user';
+  div.textContent=content;
+  el.appendChild(div);
+  el.scrollTop=el.scrollHeight;
+}
+
+function showTyping(){
+  const el=document.getElementById('ai-msgs');
+  const div=document.createElement('div');
+  div.className='msg-ai ai-loading';div.id='ai-typing';
+  div.innerHTML='<div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>';
+  el.appendChild(div);el.scrollTop=el.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('ai-typing');if(t)t.remove();}
+
+async function callAI(systemPrompt,messages){
+  showTyping();
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:systemPrompt,messages:messages})});
+    const data=await res.json();
+    hideTyping();
+    const text=data.content&&data.content[0]?data.content[0].text:'Sorry, could not connect. Please try again.';
+    aiMsgs.push({role:'assistant',content:text});
+    const taskMatch=text.match(/<TASKS>([\s\S]*?)<\/TASKS>/);
+    if(taskMatch){
+      try{
+        const parsed=JSON.parse(taskMatch[1]);
+        aiPendingTasks=parsed;
+        const cleanText=text.replace(/<TASKS>[\s\S]*?<\/TASKS>/,'').trim();
+        if(cleanText)addAIMsg('assistant',cleanText);
+        showTaskPreview(parsed);
+      }catch(e){addAIMsg('assistant',text);}
+    }else{addAIMsg('assistant',text);}
+  }catch(e){hideTyping();addAIMsg('assistant','Connection error. Make sure you have internet access.');}
+}
+
+function showTaskPreview(taskList){
+  const el=document.getElementById('ai-tasks-preview');
+  let h=`<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px">${taskList.length} tasks ready to add</div>`;
+  h+=taskList.map(t=>`<div class="task-preview"><div class="task-preview-title">${t.title}</div><div class="task-preview-meta">${t.date} · ${(t.platforms||[]).join(', ')}<br>${t.notes||''}</div></div>`).join('');
+  h+=`<button class="add-tasks-btn" onclick="addAITasks()">Add all ${taskList.length} tasks to my calendar</button>`;
+  el.innerHTML=h;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function addAITasks(){
+  const defaultAcct=accounts.length?accounts[0].id:'';
+  aiPendingTasks.forEach(t=>{
+    tasks.push({id:'t'+Date.now()+Math.random(),title:t.title,notes:t.notes||'',date:t.date||today(),acctId:t.acctId||defaultAcct,platforms:t.platforms||['YouTube'],status:t.status||'pending',posted:false,created:Date.now()});
+  });
+  tasks.sort((a,b)=>a.date>b.date?1:-1);
+  save();
+  document.getElementById('ai-tasks-preview').innerHTML=`<div class="ins ig" style="margin-top:8px">${aiPendingTasks.length} tasks added to your calendar! Go to the Calendar or Tasks tab to see them.</div>`;
+  aiPendingTasks=[];
+}
+
+function sendAI(){
+  const input=document.getElementById('ai-input');const text=input.value.trim();if(!text||aiActive)return;
+  input.value='';
+  addAIMsg('user',text);
+  aiMsgs.push({role:'user',content:text});
+  const acctNames=accounts.map(a=>`${a.name} (${a.platform})`).join(', ')||'no accounts yet';
+  const sys=`You are a content planning assistant for Zahraaracil, an Arabic family channel with two girls: Zahraa and baby Racil. Best content: Racil jealous of dad giving attention to Zahraa, crying reactions, ice cream prop, sibling rivalry. Arabic-speaking audience (Iraq, Saudi). Accounts: ${acctNames}. Generate a weekly plan as JSON in <TASKS> tags when ready. Format: [{"title":"Arabic title","notes":"English tip","date":"YYYY-MM-DD","platforms":["YouTube","Instagram","TikTok","Snapchat"],"status":"pending","acctId":""}]. Mix Shorts (Sat/Sun/Tue/Thu) with one long-form Wednesday. 5-10 tasks total.`;
+  callAI(sys,aiMsgs);
+}
+
+load();popTF();rToday();
+</script>
+</body>
+</html>
